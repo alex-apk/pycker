@@ -114,3 +114,30 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_TICKET_LIFECYCLE = {
+    "new":      {
+        "initial": True,
+        "default": True,
+        "next":    ["open", "resolved", "rejected", "deleted"]
+    },
+    "stalled":  {
+        "next": ["open", "resolved", "rejected", "deleted"]
+    },
+    "open":     {
+        "initial": True,
+        "next":    ["new", "resolved", "stalled", "rejected", "deleted"]
+    },
+    "resolved": {
+        "initial": True,
+        "next":    ["closed", "stalled", "rejected", "deleted"]
+    },
+    "closed":   {
+        "final": True
+    },
+    "rejected": {
+        "next": ["open", "deleted"]
+    },
+    "deleted":  {
+        "next": ["new"]
+    }
+}
