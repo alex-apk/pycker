@@ -23,20 +23,27 @@ class Lifecycle(models.Model):
 
         return True
 
-    def save(self, *args, **kwargs):
-        # validate new lifecycle
+    @staticmethod
+    def validate_lifecycle(lifecycle):
         default_count = 0
         has_initial = False
-        if not self.lifecycle:
+        if not lifecycle:
             raise ValueError("Empty lifecycle!")
 
-        for status, vals in self.lifecycle.items():
+        for status, vals in lifecycle.items():
             is_orphan = True
             if vals.get("initial", False):
                 has_initial = True
             if vals.get("default", False):
                 default_count += 1
-            for s, v in self.lifecycle.items():
+            if not vals.get("final", False):
+                if not vals.get("next", []):
+                    raise ValueError(f"Status '{status}' is a dead-end")
+                for n in vals["next"]:
+                    if n not in lifecycle:
+                        raise ValueError(f"Lifecycle doesn't have status '{n}'")
+
+            for s, v in lifecycle.items():
                 if status in v.get("next", []):
                     is_orphan = False
                     break
@@ -50,6 +57,9 @@ class Lifecycle(models.Model):
             raise ValueError("New lifecycle has more than one default statuses")
         if not has_initial:
             raise ValueError("New lifecycle has no initial statuses")
+
+    def save(self, *args, **kwargs):
+        Lifecycle.validate_lifecycle(self.lifecycle)
         super().save(*args, **kwargs)
 
     def __str__(self):
