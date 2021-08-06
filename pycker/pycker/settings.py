@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "users.apps.UsersConfig",
     "lifecycles.apps.LifecyclesConfig",
-    "tickets.apps.TicketsConfig"
+    "tickets.apps.TicketsConfig",
+    "customfields.apps.CustomfieldsConfig"
 ]
 
 MIDDLEWARE = [
