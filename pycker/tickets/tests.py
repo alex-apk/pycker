@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from tickets import models as t_models
 from lifecycles.models import Lifecycle
 from django.test import TestCase
@@ -9,33 +10,7 @@ User = get_user_model()
 
 class TestTicketsBasic(TestCase):
     def setUp(self):
-        default_lifecycle = {
-            "new":      {
-                "initial": True,
-                "default": True,
-                "next":    ["open", "resolved", "rejected", "deleted"]
-            },
-            "stalled":  {
-                "next": ["open", "resolved", "rejected", "deleted"]
-            },
-            "open":     {
-                "initial": True,
-                "next":    ["new", "resolved", "stalled", "rejected", "deleted"]
-            },
-            "resolved": {
-                "initial": True,
-                "next":    ["closed", "stalled", "rejected", "deleted"]
-            },
-            "closed":   {
-                "final": True
-            },
-            "rejected": {
-                "next": ["open", "deleted"]
-            },
-            "deleted":  {
-                "next": ["new"]
-            }
-        }
+        default_lifecycle = settings.DEFAULT_TICKET_LIFECYCLE
         self.lifecycle = Lifecycle.objects.create(name="default",
                                                   lifecycle=default_lifecycle)
         self.queue = t_models.Queue.objects.create(name="default_queue",

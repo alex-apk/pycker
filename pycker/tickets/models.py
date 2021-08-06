@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from customfields.models import CustomFieldsComp, HasCustomFieldsMixin
+
 
 User = get_user_model()
 
@@ -31,7 +33,8 @@ class Ticket(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.catalog_name = "queue"
+        self.catalog_id = self.queue.id
+        self.customfield = CustomFieldsComp(self, self.queue.id)
 
     def save(self, *args, **kwargs):
         if self.status not in self.queue.lifecycle.lifecycle.keys():
@@ -40,7 +43,8 @@ class Ticket(models.Model):
         super().save(*args, **kwargs)
 
 
-class Queue(models.Model):
+class Queue(models.Model, HasCustomFieldsMixin):
+    cat_obj_type = "Ticket"
     name = models.CharField(max_length=20, null=False)
     lifecycle = models.ForeignKey("lifecycles.Lifecycle", null=False,
                                   on_delete=models.CASCADE)
