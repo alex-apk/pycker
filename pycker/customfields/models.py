@@ -93,13 +93,13 @@ class CustomFieldsComp:
                                object_id=self.parent.id,
                                object_type=self.parent_obj_type,
                                value=v)
-        else:
-            ObjCustomFieldValues. \
-                objects. \
-                create(customfield=customfield,
-                       object_id=self.parent.id,
-                       object_type=self.parent_obj_type,
-                       value=value)
+                return
+        ObjCustomFieldValues. \
+            objects. \
+            create(customfield=customfield,
+                   object_id=self.parent.id,
+                   object_type=self.parent_obj_type,
+                   value=value)
 
 
 class HasCustomFieldsMixin:
