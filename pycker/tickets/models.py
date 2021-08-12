@@ -1,12 +1,13 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from customfields.models import CustomFieldsComp, HasCustomFieldsMixin
+from links.models import LinkableMixin
 
 
 User = get_user_model()
 
 
-class Ticket(models.Model):
+class Ticket(models.Model, LinkableMixin):
     queue = models.ForeignKey("tickets.Queue", on_delete=models.CASCADE,
                               null=False)
     created = models.DateTimeField(auto_now=True, null=False)
