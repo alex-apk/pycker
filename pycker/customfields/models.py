@@ -40,6 +40,19 @@ class CustomFieldsComp:
         # TODO: со значениями?)
         pass
 
+    def add_value(self, field, value):
+        customfield = self.__get_customfield(field)
+        if not customfield.multiple:
+            raise ValueError(f"Customfield {customfield} does not allow "
+                             f"multiple values")
+
+        ObjCustomFieldValues. \
+            objects. \
+            create(customfield=customfield,
+                   object_id=self.parent.id,
+                   object_type=self.parent_obj_type,
+                   value=value)
+
     def __get_customfield(self, item):
         if isinstance(item, int):
             cfs = CustomFieldToCatalog. \
