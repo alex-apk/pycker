@@ -84,22 +84,23 @@ class CustomFieldsComp:
         customfield = self.__get_customfield(key)
         qs = self.__get_cf_vals_objs_qs(customfield)
         qs.delete()
-        if customfield.multiple:
-            if isinstance(value, list) or isinstance(value, tuple):
-                for v in value:
-                    ObjCustomFieldValues.\
-                        objects.\
-                        create(customfield=customfield,
-                               object_id=self.parent.id,
-                               object_type=self.parent_obj_type,
-                               value=v)
-                return
-        ObjCustomFieldValues. \
-            objects. \
-            create(customfield=customfield,
-                   object_id=self.parent.id,
-                   object_type=self.parent_obj_type,
-                   value=value)
+        if value is not None:
+            if customfield.multiple:
+                if isinstance(value, list) or isinstance(value, tuple):
+                    for v in value:
+                        ObjCustomFieldValues.\
+                            objects.\
+                            create(customfield=customfield,
+                                   object_id=self.parent.id,
+                                   object_type=self.parent_obj_type,
+                                   value=v)
+                    return
+            ObjCustomFieldValues. \
+                objects. \
+                create(customfield=customfield,
+                       object_id=self.parent.id,
+                       object_type=self.parent_obj_type,
+                       value=value)
 
 
 class HasCustomFieldsMixin:
