@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     "tickets.apps.TicketsConfig",
     "customfields.apps.CustomfieldsConfig",
     "assets.apps.AssetsConfig",
-    "links.apps.LinksConfig"
+    "links.apps.LinksConfig",
+    "utils.apps.UtilsConfig"
 ]
 
 MIDDLEWARE = [
