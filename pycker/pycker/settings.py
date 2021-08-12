@@ -15,7 +15,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -28,7 +27,8 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "lifecycles.apps.LifecyclesConfig",
     "tickets.apps.TicketsConfig",
-    "customfields.apps.CustomfieldsConfig"
+    "customfields.apps.CustomfieldsConfig",
+    "assets.apps.AssetsConfig"
 ]
 
 MIDDLEWARE = [
@@ -61,7 +61,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pycker.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -71,7 +70,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -91,7 +89,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -105,7 +102,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -116,29 +112,54 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_TICKET_LIFECYCLE = {
-    "new":      {
+    "new": {
         "initial": True,
         "default": True,
-        "next":    ["open", "resolved", "rejected", "deleted"]
-    },
-    "stalled":  {
         "next": ["open", "resolved", "rejected", "deleted"]
     },
-    "open":     {
+    "stalled": {
+        "next": ["open", "resolved", "rejected", "deleted"]
+    },
+    "open": {
         "initial": True,
-        "next":    ["new", "resolved", "stalled", "rejected", "deleted"]
+        "next": ["new", "resolved", "stalled", "rejected", "deleted"]
     },
     "resolved": {
         "initial": True,
-        "next":    ["closed", "stalled", "rejected", "deleted"]
+        "next": ["closed", "stalled", "rejected", "deleted"]
     },
-    "closed":   {
+    "closed": {
         "final": True
     },
     "rejected": {
         "next": ["open", "deleted"]
     },
-    "deleted":  {
+    "deleted": {
+        "next": ["new"]
+    }
+}
+
+DEFAULT_ASSET_LIFECYCLE = {
+    "new": {
+        "initial": True,
+        "default": True,
+        "next": ["allocated", "in-use", "recycled", "stolen", "deleted"]
+    },
+    "allocated": {
+        "initial": True,
+        "next": ["in-use", "recycled", "stolen"]
+    },
+    "in-use": {
+        "initial": True,
+        "next": ["allocated", "recycled", "stolen"]
+    },
+    "recycled": {
+        "next": ["allocated", "deleted", "in-use"]
+    },
+    "stolen": {
+        "next": ["allocated", "deleted", "in-use"]
+    },
+    "deleted": {
         "next": ["new"]
     }
 }
