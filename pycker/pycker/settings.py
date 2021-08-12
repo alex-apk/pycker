@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     "lifecycles.apps.LifecyclesConfig",
     "tickets.apps.TicketsConfig",
     "customfields.apps.CustomfieldsConfig",
-    "assets.apps.AssetsConfig"
+    "assets.apps.AssetsConfig",
+    "links.apps.LinksConfig"
 ]
 
 MIDDLEWARE = [

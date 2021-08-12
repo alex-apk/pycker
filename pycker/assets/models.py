@@ -1,12 +1,13 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from customfields.models import CustomFieldsComp, HasCustomFieldsMixin
+from links.models import LinkableMixin
 
 
 User = get_user_model()
 
 
-class Asset(models.Model):
+class Asset(models.Model, LinkableMixin):
     catalog = models.ForeignKey("assets.Catalog", on_delete=models.CASCADE,
                                 null=False)
     created = models.DateTimeField(auto_now=True, null=False)
