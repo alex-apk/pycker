@@ -53,6 +53,12 @@ class CustomFieldsComp:
                    object_type=self.parent_obj_type,
                    value=value)
 
+    def remove_value(self, field, value):
+        customfield = self.__get_customfield(field)
+        qs = self.__get_cf_vals_objs_qs(customfield)
+        val = qs.filter(value=value)
+        val.delete()
+
     def __get_customfield(self, item):
         if isinstance(item, int):
             cfs = CustomFieldToCatalog. \
