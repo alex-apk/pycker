@@ -168,13 +168,9 @@ class HasCustomFieldsMixin:
             # TODO: зависимости от того, был ли кастомфилд добавлен.
             print(str(e))
 
-    # TODO: выглядит довольно-таки уродливо, особенно вызов. В идеале,
-    # TODO: добавление кастомфилдов должно вызываться для инстанса объекта
-    # TODO: для каталогов и для класса для объектов без каталогов. Надо
-    # TODO: как-то это переписать.
-    @staticmethod
-    def add_customfield_static(obj, customfield: CustomField):
-        cat_name = obj.__name__
+    @classmethod
+    def add_customfield_static(cls, customfield: CustomField):
+        cat_name = cls.__name__
         cat_id = 1
         try:
             CustomFieldToCatalog.objects.create(customfield=customfield,
