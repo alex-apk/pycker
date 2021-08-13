@@ -110,6 +110,8 @@ class CustomFieldsComp:
     def __getitem__(self, item):
         customfield = self.__get_customfield(item)
         vals = self.__get_cf_vals_objs_qs(customfield)
+        if not vals:
+            return None
         if customfield.multiple:
             return [val.value for val in vals.all()]
         if vals.first():
