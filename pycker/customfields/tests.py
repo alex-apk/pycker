@@ -78,10 +78,11 @@ class CFTest(TestCase):
     def test_add_cf_to_users(self):
         user = User.objects.create_user(username="test", password="password")
         test_value = "test value 2"
-        User.add_customfield_static(User, self.customfields[0])
+        User.add_customfield_static(self.customfields[0])
 
         user.customfield["cf1"] = test_value
         self.assertEqual(user.customfield[1], test_value)
+        self.assertEqual(user.customfield["cf1"], test_value)
 
     def test_get_all_customfields(self):
         ticket = Ticket.objects.create(queue=self.queue)
