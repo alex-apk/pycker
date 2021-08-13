@@ -35,10 +35,44 @@ class CustomFieldsComp:
         self.parent_id = self.parent.id
         self.catalog_id = cat_id
 
-    def all(self):
-        # TODO: возвращать все кастомфилды объекта (возможно сразу
-        # TODO: со значениями?)
-        pass
+    def all(self, with_values=True):
+        cftcs = CustomFieldToCatalog.\
+            objects.\
+            filter(catalog_id=self.catalog_id,
+                   object_type=self.parent_obj_type).all()
+        cfs = [cftc.customfield for cftc in cftcs]
+        if not with_values:
+            return cfs
+
+        return {
+            cf.name: self[cf]
+            for cf in cfs
+        }
+
+    def add_value(self, field, value):
+        customfield = self.__get_customfield(field)
+        if not customfield.multiple:
+            # TODO: А надо ли кидать эксепшн во всех случаях? Может
+            # TODO: быть нужно это делать только если у кастомфилда уже
+            # TODO: задано какое-то значение?
+            raise ValueError(f"Customfield {customfield} does not allow "
+                             f"multiple values")
+        if isinstance(value, list) or isinstance(value, tuple):
+            for v in value:
+                self.add_value(field, v)
+        else:
+            ObjCustomFieldValues. \
+                objects. \
+                create(customfield=customfield,
+                       object_id=self.parent.id,
+                       object_type=self.parent_obj_type,
+                       value=value)
+
+    def remove_value(self, field, value):
+        customfield = self.__get_customfield(field)
+        qs = self.__get_cf_vals_objs_qs(customfield)
+        val = qs.filter(value=value)
+        val.delete()
 
     def __get_customfield(self, item):
         if isinstance(item, int):
@@ -53,6 +87,8 @@ class CustomFieldsComp:
                   filter(customfield__name=item,
                          catalog_id=self.catalog_id,
                          object_type=self.parent_obj_type).all()
+        elif isinstance(item, CustomField):
+            return item
         else:
             raise ValueError("Can only get CustomFields by id or by name")
         if cfs:
@@ -74,6 +110,8 @@ class CustomFieldsComp:
     def __getitem__(self, item):
         customfield = self.__get_customfield(item)
         vals = self.__get_cf_vals_objs_qs(customfield)
+        if not vals:
+            return None
         if customfield.multiple:
             return [val.value for val in vals.all()]
         if vals.first():
@@ -130,13 +168,9 @@ class HasCustomFieldsMixin:
             # TODO: зависимости от того, был ли кастомфилд добавлен.
             print(str(e))
 
-    # TODO: выглядит довольно-таки уродливо, особенно вызов. В идеале,
-    # TODO: добавление кастомфилдов должно вызываться для инстанса объекта
-    # TODO: для каталогов и для класса для объектов без каталогов. Надо
-    # TODO: как-то это переписать.
-    @staticmethod
-    def add_customfield_static(obj, customfield: CustomField):
-        cat_name = obj.__name__
+    @classmethod
+    def add_customfield_static(cls, customfield: CustomField):
+        cat_name = cls.__name__
         cat_id = 1
         try:
             CustomFieldToCatalog.objects.create(customfield=customfield,
