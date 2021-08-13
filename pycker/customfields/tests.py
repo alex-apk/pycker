@@ -43,6 +43,18 @@ class CFTest(TestCase):
         ticket.customfield.add_value("cf3", "val3")
         self.assertEqual(ticket.customfield["cf3"], ["val1", "val2", "val3"])
 
+        # test adding multiple type customfield value to a list
+        test_cf4_vals = ["1", "2", "3"]
+        ticket.customfield.add_value("cf4", test_cf4_vals)
+        self.assertEqual(ticket.customfield["cf4"], test_cf4_vals)
+
+        for v in test_cf4_vals:
+            ticket.customfield.remove_value("cf4", v)
+
+        # test setting multiple type customfield value to a list
+        ticket.customfield["cf4"] = test_cf4_vals
+        self.assertEqual(ticket.customfield["cf4"], test_cf4_vals)
+
         # remove one value
         ticket.customfield.remove_value("cf3", "val1")
         # should have two values left in that customfield now
