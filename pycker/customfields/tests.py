@@ -19,23 +19,49 @@ class CFTest(TestCase):
         self.customfields = [
             CustomField.objects.create(name="cf1", type="type1"),
             CustomField.objects.create(name="cf2", type="type2"),
-            CustomField.objects.create(name="cf3", type="type3"),
-            CustomField.objects.create(name="cf4", type="type4")
+            CustomField.objects.create(name="cf3", type="type3", multiple=True),
+            CustomField.objects.create(name="cf4", type="type4", multiple=True)
         ]
 
-    def test_add_cfs_to_queue(self):
         for cf in self.customfields:
             self.queue.add_customfield(cf)
 
-    def test_add_cf_value(self):
-        for cf in self.customfields:
-            self.queue.add_customfield(cf)
-
+    def test_set_cf_value(self):
         test_value = "test value"
         ticket = Ticket.objects.create(queue=self.queue)
         ticket.customfield["cf1"] = test_value
         self.assertEqual(ticket.customfield["cf1"], test_value)
         self.assertIsNone(ticket.customfield["cf2"])
+
+    def test_add_remove_cf_value(self):
+        ticket = Ticket.objects.create(queue=self.queue)
+        # add to multiple
+        ticket.customfield.add_value("cf3", "val1")
+        # multiple type customfields should always return lists
+        self.assertEqual(ticket.customfield["cf3"], ["val1"])
+        ticket.customfield.add_value("cf3", "val2")
+        ticket.customfield.add_value("cf3", "val3")
+        self.assertEqual(ticket.customfield["cf3"], ["val1", "val2", "val3"])
+
+        # remove one value
+        ticket.customfield.remove_value("cf3", "val1")
+        # should have two values left in that customfield now
+        self.assertEqual(ticket.customfield["cf3"], ["val2", "val3"])
+
+        # should not modify cf values
+        ticket.customfield.remove_value("cf3", "val1")
+        self.assertEqual(ticket.customfield["cf3"], ["val2", "val3"])
+
+        # cf1 is not multiple, should raise ValueError as of now
+        with self.assertRaises(ValueError):
+            ticket.customfield.add_value("cf1", "bad value")
+
+        ticket.customfield["cf1"] = "good value"
+        self.assertEqual(ticket.customfield["cf1"], "good value")
+
+        # removing values should work regardless of customfield type
+        ticket.customfield.remove_value("cf1", "good value")
+        self.assertIsNone(ticket.customfield["cf1"])
 
     def test_add_cf_to_users(self):
         user = User.objects.create_user(username="test", password="password")
