@@ -35,10 +35,19 @@ class CustomFieldsComp:
         self.parent_id = self.parent.id
         self.catalog_id = cat_id
 
-    def all(self):
-        # TODO: возвращать все кастомфилды объекта (возможно сразу
-        # TODO: со значениями?)
-        pass
+    def all(self, with_values=True):
+        cftcs = CustomFieldToCatalog.\
+            objects.\
+            filter(catalog_id=self.catalog_id,
+                   object_type=self.parent_obj_type).all()
+        cfs = [cftc.customfield for cftc in cftcs]
+        if not with_values:
+            return cfs
+
+        return {
+            cf.name: self[cf]
+            for cf in cfs
+        }
 
     def add_value(self, field, value):
         customfield = self.__get_customfield(field)
