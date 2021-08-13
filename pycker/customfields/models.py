@@ -48,13 +48,16 @@ class CustomFieldsComp:
             # TODO: задано какое-то значение?
             raise ValueError(f"Customfield {customfield} does not allow "
                              f"multiple values")
-
-        ObjCustomFieldValues. \
-            objects. \
-            create(customfield=customfield,
-                   object_id=self.parent.id,
-                   object_type=self.parent_obj_type,
-                   value=value)
+        if isinstance(value, list) or isinstance(value, tuple):
+            for v in value:
+                self.add_value(field, v)
+        else:
+            ObjCustomFieldValues. \
+                objects. \
+                create(customfield=customfield,
+                       object_id=self.parent.id,
+                       object_type=self.parent_obj_type,
+                       value=value)
 
     def remove_value(self, field, value):
         customfield = self.__get_customfield(field)
@@ -75,6 +78,8 @@ class CustomFieldsComp:
                   filter(customfield__name=item,
                          catalog_id=self.catalog_id,
                          object_type=self.parent_obj_type).all()
+        elif isinstance(item, CustomField):
+            return item
         else:
             raise ValueError("Can only get CustomFields by id or by name")
         if cfs:
