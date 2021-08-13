@@ -43,6 +43,9 @@ class CustomFieldsComp:
     def add_value(self, field, value):
         customfield = self.__get_customfield(field)
         if not customfield.multiple:
+            # TODO: А надо ли кидать эксепшн во всех случаях? Может
+            # TODO: быть нужно это делать только если у кастомфилда уже
+            # TODO: задано какое-то значение?
             raise ValueError(f"Customfield {customfield} does not allow "
                              f"multiple values")
 
