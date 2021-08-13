@@ -82,3 +82,38 @@ class CFTest(TestCase):
 
         user.customfield["cf1"] = test_value
         self.assertEqual(user.customfield[1], test_value)
+
+    def test_get_all_customfields(self):
+        ticket = Ticket.objects.create(queue=self.queue)
+        # test getting list of cf objects
+        ticket_cfs = ticket.customfield.all(with_values=False)
+        self.assertEqual(list(ticket_cfs), self.customfields)
+
+        # set up ticket cf values
+        ticket.customfield["cf1"] = "cf1val"
+        ticket.customfield["cf2"] = "cf2val"
+        ticket.customfield["cf3"] = ["cf3val1", "cf3val2"]
+        ticket.customfield["cf4"] = "cf4val1"
+        ticket.customfield.add_value("cf4", "cf4val2")
+
+        # example dict to compare with
+        ex_dict = {
+            "cf1": "cf1val",
+            "cf2": "cf2val",
+            "cf3": ["cf3val1", "cf3val2"],
+            "cf4": ["cf4val1", "cf4val2"]
+        }
+        # test ticket returns customfields with values
+        self.assertEqual(ex_dict, ticket.customfield.all())
+
+        # test object returns all unset cfs as None
+        ticket = Ticket.objects.create(queue=self.queue)
+        ticket.customfield["cf1"] = "val"
+        ex_dict = {
+            "cf1": "val",
+            "cf2": None,
+            "cf3": None,
+            "cf4": None,
+        }
+        self.assertEqual(ex_dict, ticket.customfield.all())
+
