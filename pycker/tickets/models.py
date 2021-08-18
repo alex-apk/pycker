@@ -12,7 +12,7 @@ class Ticket(models.Model, LinkableMixin):
                               null=False)
     created = models.DateTimeField(auto_now=True, null=False)
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE,
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL,
                               null=True)
     subject = models.CharField(max_length=150, default="(no subject)",
                                null=False)
